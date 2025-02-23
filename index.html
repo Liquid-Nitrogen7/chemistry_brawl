@@ -1,22 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chemistry Brawl</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 20px;
+        }
+
+        #battlefield {
+            display: block;
+            margin: 20px auto;
+            background-color: #000;
+        }
+
         button {
             margin-right: 10px;
+            padding: 10px 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
+
+        button:not([style*='background-color:grey']) {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        button:not([style*='background-color:grey']):hover {
+            background-color: #0056b3;
+        }
+
+        button[style*='background-color:grey'] {
+            background-color: grey;
+            color: white;
+            cursor: not-allowed;
+        }
+
+        #stats {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        #atomShop, #compoundPurchase {
+            margin-top: 15px;
+        }
+
     </style>
 </head>
 
 <body>
     <canvas id="battlefield"></canvas><br>
-    Coins: <span id="coins">0</span><br>
-    Score: <span id="score">0</span><br>
-    Atom Inventory: <span id="inventory"></span><br>
+    <div id="stats">
+        Coins: <span id="coins">0</span> | Score: <span id="score">0</span> | Atom Inventory: <span id="inventory"></span>
+    </div>
     <div id="atomShop"></div><br>
     <div id="compoundPurchase"></div>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.js"></script>

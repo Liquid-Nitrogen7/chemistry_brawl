@@ -23,6 +23,8 @@ let rightPressed = false;
 let upPressed = false;
 let downPressed = false;
 
+let gameStarted = false;
+
 function keyPressed() {
     if (keyCode === LEFT_ARROW || key === 'a') {
         leftPressed = true;
@@ -168,8 +170,7 @@ function draw() {
     }
 
     //waves
-    waveTimer--;
-    console.log(waveTimer)
+    if (gameStarted) { waveTimer--; }
     if (waveTimer == 0) {
         waveTimer = 2000
         wavePower += 0.05
@@ -255,6 +256,9 @@ function createCompound(recipe) {
         atomInventory.splice(atomInventory.indexOf(x), 1)
     }
     compoundsInventory.push([recipe[1], 0])
+    if(recipe[1]=="H2"){
+        gameStarted=true;
+    }
     updateChemistry()
     updateCompoundPurchase()
 }

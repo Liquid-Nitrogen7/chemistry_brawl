@@ -1,0 +1,46 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f4;
+    margin: 20px;
+}
+
+#battlefield {
+    display: block;
+    margin: 20px auto;
+    background-color: #000;
+}
+
+button {
+    margin-right: 10px;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:not([style*='background-color:grey']) {
+    background-color: #007BFF;
+    color: white;
+}
+
+button:not([style*='background-color:grey']):hover {
+    background-color: #0056b3;
+}
+
+button[style*='background-color:grey'] {
+    background-color: grey;
+    color: white;
+    cursor: not-allowed;
+}
+
+#stats {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+#atomShop, #compoundPurchase {
+    margin-top: 15px;
+}

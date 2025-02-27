@@ -125,19 +125,33 @@ function draw() {
 
     if (keyIsPressed) {
         //player motion
-        if (leftPressed) {
-            player[0] -= 3;
+        if (((leftPressed || upPressed) && !(leftPressed && upPressed)) && ((leftPressed || downPressed) && !(leftPressed && downPressed)) && ((rightPressed || upPressed) && !(rightPressed && upPressed)) && ((rightPressed || downPressed) && !(rightPressed && downPressed))) {
+            if (leftPressed) {
+                player[0] -= 3;
+            }
+            if (rightPressed) {
+                player[0] += 3;
+            }
+            if (upPressed) {
+                player[1] -= 3;
+            }
+            if (downPressed) {
+                player[1] += 3;
+            }
+        }else{
+            if (leftPressed) {
+                player[0] -= Math.sqrt(4.5);
+            }
+            if (rightPressed) {
+                player[0] += Math.sqrt(4.5);
+            }
+            if (upPressed) {
+                player[1] -= Math.sqrt(4.5);
+            }
+            if (downPressed) {
+                player[1] += Math.sqrt(4.5);
+            }
         }
-        if (rightPressed) {
-            player[0] += 3;
-        }
-        if (upPressed) {
-            player[1] -= 3;
-        }
-        if (downPressed) {
-            player[1] += 3;
-        }
-
         //compound use
         if (key == "1") {
             useCompound(0)
@@ -256,8 +270,8 @@ function createCompound(recipe) {
         atomInventory.splice(atomInventory.indexOf(x), 1)
     }
     compoundsInventory.push([recipe[1], 0])
-    if(recipe[1]=="H2"){
-        gameStarted=true;
+    if (recipe[1] == "H2") {
+        gameStarted = true;
     }
     updateChemistry()
     updateCompoundPurchase()

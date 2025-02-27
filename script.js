@@ -1,0 +1,282 @@
+//setup
+let atomInventory = ["H", "H"]
+let compoundsInventory = []
+const compoundsList = [
+    [["H", "H"], "H2"],
+]
+const atomsList = [
+    ["H", 10, 5],
+    ["O", 70, 3],
+]
+let atomShop = [["H", 10], ["H", 10], ["O", 70]]
+let coins = 0;
+let score = 0;
+let enemies = [];
+let enemySpawnChances = 1
+let player = [250, 250, 50]
+let playerStatus = [0]
+let waveTimer = 100;
+let wavePower = 1
+
+let leftPressed = false;
+let rightPressed = false;
+let upPressed = false;
+let downPressed = false;
+
+function keyPressed() {
+    if (keyCode === LEFT_ARROW || key === 'a') {
+        leftPressed = true;
+    }
+    if (keyCode === RIGHT_ARROW || key === 'd') {
+        rightPressed = true;
+    }
+    if (keyCode === UP_ARROW || key === 'w') {
+        upPressed = true;
+    }
+    if (keyCode === DOWN_ARROW || key === 's') {
+        downPressed = true;
+    }
+}
+
+function keyReleased() {
+    if (keyCode === LEFT_ARROW || key === 'a') {
+        leftPressed = false;
+    }
+    if (keyCode === RIGHT_ARROW || key === 'd') {
+        rightPressed = false;
+    }
+    if (keyCode === UP_ARROW || key === 'w') {
+        upPressed = false;
+    }
+    if (keyCode === DOWN_ARROW || key === 's') {
+        downPressed = false;
+    }
+}
+
+//prevent scrolling
+window.addEventListener("keydown", function (event) {
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "a", "s", "d"].includes(event.key)) {
+        event.preventDefault();
+    }
+});
+
+window.addEventListener("keyup", function (event) {
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "a", "s", "d"].includes(event.key)) {
+        event.preventDefault();
+    }
+});
+
+function setup() {
+    createCanvas(500, 500, document.getElementById("battlefield"))
+    noStroke()
+}
+let gameOver = false
+
+function draw() {
+    background(0)
+
+    //enemy handling
+    for (let e of enemies) {
+        //draw enemies
+        stroke(255, 0, e[2] * 10)
+        strokeWeight(e[2] * 2)
+        point(e[0], e[1])
+        //move enemies to player
+        let xdiff = player[0] - e[0]
+        let ydiff = player[1] - e[1]
+        let d = dist(player[0], player[1], e[0], e[1])
+        e[0] += xdiff / d
+        e[1] += ydiff / d
+        //knockback & attack
+        if (d < player[2] / 5) {
+            e[3] = 7
+            player[2] -= e[2]
+        }
+        if (e[3]) {
+            e[0] -= xdiff * 5 / d
+            e[1] -= ydiff * 5 / d
+            e[3]--;
+        }
+    }
+
+    //show player
+    stroke(0, 150, 255)
+    strokeWeight(player[2] / 2)
+    point(player[0], player[1])
+
+    //show compounds
+    noStroke()
+    let num = 0;
+    for (let c of compoundsInventory) {
+        fill(0, 150, 255)
+        rect(num * 70 + 20, 430, 50, 50)
+        fill(100, 100)
+        rect(num * 70 + 20, 480 - c[1], 50, c[1])
+        fill(0)
+        textAlign(CENTER, CENTER)
+        text(c[0], num * 70 + 45, 455)
+        if (c[1] > 0) {
+            c[1] -= 0.5;
+        }
+        num++;
+    }
+
+    if (keyIsPressed) {
+        //player motion
+        if (leftPressed) {
+            player[0] -= 3;
+        }
+        if (rightPressed) {
+            player[0] += 3;
+        }
+        if (upPressed) {
+            player[1] -= 3;
+        }
+        if (downPressed) {
+            player[1] += 3;
+        }
+
+        //compound use
+        if (key == "1") {
+            useCompound(0)
+        }
+    }
+
+    //compound effects
+    if (playerStatus[0]) {
+        fill(0, 255, 0, 100)
+        ellipse(player[0], player[1], player[2] + 25)
+        for (let e of enemies) {
+            if (dist(e[0], e[1], player[0], player[1]) < player[2] + 25 / 2) {
+                e[2] -= 1;
+                if (e[2] < 0) {
+                    enemies.splice(enemies.indexOf(e), 1)
+                    coins += 1
+                    score += 1
+                    updateCoinsAndScore()
+                }
+            }
+        }
+        playerStatus[0]--;
+    }
+
+    //end
+    if (player[2] <= 0 && gameOver == false) {
+        gameOver = true;
+        alert("Game Over")
+        location.reload()
+    }
+
+    //waves
+    waveTimer--;
+    console.log(waveTimer)
+    if (waveTimer == 0) {
+        waveTimer = 2000
+        wavePower += 0.05
+        //enemy spawner
+        for (let i = 0; i < wavePower * 10; i++) {
+            enemies.push([Math.random() * 500 - 500, Math.random() * 500, Math.ceil(Math.sqrt(Math.random() * wavePower * 5)), 0])
+            enemies.push([Math.random() * 500 + 500, Math.random() * 500, Math.ceil(Math.sqrt(Math.random() * wavePower * 5)), 0])
+            enemies.push([Math.random() * 500, Math.random() * 500 - 500, Math.ceil(Math.sqrt(Math.random() * wavePower * 5)), 0])
+            enemies.push([Math.random() * 500, Math.random() * 500 + 500, Math.ceil(Math.sqrt(Math.random() * wavePower * 5)), 0])
+        }
+    }
+}
+
+//update functions
+function updateChemistry() {
+    atomInventory.sort()
+    let inv = ""
+    for (x of atomInventory) {
+        inv += x + ", "
+    }
+    let inv2 = inv.split("")
+    inv2.splice(-2, 2)
+    inv = inv2.join("")
+    $("#inventory").html(inv2)
+}
+function updateAtomShop() {
+    let atomShopHTML = ""
+    for (x of atomShop) {
+        if (coins >= x[1]) {
+            atomShopHTML += `<button onclick="buyAtom('${x[0]}', ${x[1]})"'`
+        } else {
+            atomShopHTML += "<button style='background-color:grey'"
+        }
+        atomShopHTML += `>${x[0]}<br>Cost: ${x[1]}</button>`
+    }
+    $("#atomShop").html(atomShopHTML)
+}
+function updateCompoundPurchase() {
+    let compoundPurchaseHTML = ""
+    for (x of compoundsList) {
+        let viable = true;
+        let remainingAtoms = [...atomInventory]
+        for (i of x[0]) {
+            let atomIndex = remainingAtoms.indexOf(i)
+            if (atomIndex == -1) {
+                viable = false;
+                break;
+            } else {
+                remainingAtoms.splice(atomIndex, 1)
+            }
+        }
+
+        if (viable) {
+            for (c of compoundsInventory) {
+                if (c[0] == x[1]) {
+                    viable = false
+                    break;
+                }
+            }
+            if (viable) {
+                compoundPurchaseHTML += `<button onclick='createCompound([[`
+                for (y of x[0]) {
+                    compoundPurchaseHTML += `"${y}",`
+                }
+                compoundPurchaseHTML += `], "${x[1]}"])'>Create ${x[1]}</button>`
+            }
+        }
+    }
+    $("#compoundPurchase").html(compoundPurchaseHTML)
+}
+function updateCoinsAndScore() {
+    $("#coins").html(coins)
+    $("#score").html(score)
+    updateAtomShop()
+}
+updateChemistry()
+updateAtomShop()
+updateCompoundPurchase()
+
+//purchase functions
+function createCompound(recipe) {
+    for (x of recipe[0]) {
+        atomInventory.splice(atomInventory.indexOf(x), 1)
+    }
+    compoundsInventory.push([recipe[1], 0])
+    updateChemistry()
+    updateCompoundPurchase()
+}
+function buyAtom(x, y) {
+    if (coins >= y) {
+        coins -= y
+        atomInventory.push('' + x)
+        updateCoinsAndScore()
+        updateChemistry()
+        updateCompoundPurchase()
+    }
+}
+
+//combat functions
+function useCompound(c) {
+    try {
+        let compound = compoundsInventory[c]
+        if (compound[1] == 0) {
+            if (compound[0] == "H2") {
+                playerStatus[0] = 5;
+                compound[1] += 50
+            }
+        }
+    } catch (e) { }
+}

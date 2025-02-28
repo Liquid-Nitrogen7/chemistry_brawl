@@ -3,12 +3,13 @@ let atomInventory = ["H", "H"]
 let compoundsInventory = []
 const compoundsList = [
     [["H", "H"], "H2"],
+    [["H", "H", "O"], "H2O"],
 ]
 const atomsList = [
     ["H", 10, 5],
-    ["O", 70, 3],
+    ["O", 30, 3],
 ]
-let atomShop = [["H", 10], ["H", 10], ["O", 70]]
+let atomShop = [["H", 10], ["H", 10], ["O", 30]]
 let coins = 0;
 let score = 0;
 let enemies = [];
@@ -24,6 +25,8 @@ let upPressed = false;
 let downPressed = false;
 
 let gameStarted = false;
+
+let water = []
 
 function keyPressed() {
     if (keyCode === LEFT_ARROW || key === 'a') {
@@ -77,6 +80,8 @@ let gameOver = false
 function draw() {
     background(0)
 
+
+
     //enemy handling
     for (let e of enemies) {
         //draw enemies
@@ -87,8 +92,14 @@ function draw() {
         let xdiff = player[0] - e[0]
         let ydiff = player[1] - e[1]
         let d = dist(player[0], player[1], e[0], e[1])
-        e[0] += xdiff*e[4]*2 / d
-        e[1] += ydiff*e[4]*2 / d
+        e[0] += xdiff * e[4] * 2 / d
+        e[1] += ydiff * e[4] * 2 / d
+        for (let w of water) {
+            if (dist(e[0], e[1], w[0], w[1]) < 50) {
+                e[0] -= xdiff * e[4] / d
+                e[1] -= ydiff * e[4] / d
+            }
+        }
         //knockback & attack
         if (d < player[2] / 5) {
             e[3] = 7
@@ -105,6 +116,17 @@ function draw() {
     stroke(0, 150, 255)
     strokeWeight(player[2] / 2)
     point(player[0], player[1])
+
+    //draw water
+    for (let w of water) {
+        noStroke()
+        fill(50, 150, 255, w[2])
+        ellipse(w[0], w[1], 50, 50)
+        w[2]--;
+        if (w[2] < 0) {
+            water.splice(water.indexOf(w), 1)
+        }
+    }
 
     //show compounds
     noStroke()
@@ -138,7 +160,7 @@ function draw() {
             if (downPressed) {
                 player[1] += 3;
             }
-        }else{
+        } else {
             if (leftPressed) {
                 player[0] -= Math.sqrt(4.5);
             }
@@ -153,8 +175,8 @@ function draw() {
             }
         }
         //compound use
-        if (key == "1") {
-            useCompound(0)
+        if (Number(key)) {
+            useCompound(Number(key) - 1)
         }
     }
 
@@ -293,6 +315,9 @@ function useCompound(c) {
         if (compound[1] == 0) {
             if (compound[0] == "H2") {
                 playerStatus[0] = 5;
+                compound[1] += 50
+            } else if (compound[0] == "H2O") {
+                water.push([player[0], player[1], 200])
                 compound[1] += 50
             }
         }

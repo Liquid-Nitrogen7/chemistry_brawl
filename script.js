@@ -87,8 +87,8 @@ function draw() {
         let xdiff = player[0] - e[0]
         let ydiff = player[1] - e[1]
         let d = dist(player[0], player[1], e[0], e[1])
-        e[0] += xdiff / d
-        e[1] += ydiff / d
+        e[0] += xdiff*e[4]*2 / d
+        e[1] += ydiff*e[4]*2 / d
         //knockback & attack
         if (d < player[2] / 5) {
             e[3] = 7
@@ -189,11 +189,11 @@ function draw() {
         waveTimer = 2000
         wavePower += 0.05
         //enemy spawner
-        for (let i = 0; i < wavePower * 10; i++) {
-            enemies.push([Math.random() * 500 - 500, Math.random() * 500, Math.ceil(Math.sqrt(Math.random() * wavePower * 5)), 0])
-            enemies.push([Math.random() * 500 + 500, Math.random() * 500, Math.ceil(Math.sqrt(Math.random() * wavePower * 5)), 0])
-            enemies.push([Math.random() * 500, Math.random() * 500 - 500, Math.ceil(Math.sqrt(Math.random() * wavePower * 5)), 0])
-            enemies.push([Math.random() * 500, Math.random() * 500 + 500, Math.ceil(Math.sqrt(Math.random() * wavePower * 5)), 0])
+        for (let i = 0; i < wavePower * 5; i++) {
+            enemies.push([Math.random() * 500 - 500, Math.random() * 500, Math.ceil(Math.sqrt(Math.random() * wavePower * 5)), 0, Math.random()])
+            enemies.push([Math.random() * 500 + 500, Math.random() * 500, Math.ceil(Math.sqrt(Math.random() * wavePower * 5)), 0, Math.random()])
+            enemies.push([Math.random() * 500, Math.random() * 500 - 500, Math.ceil(Math.sqrt(Math.random() * wavePower * 5)), 0, Math.random()])
+            enemies.push([Math.random() * 500, Math.random() * 500 + 500, Math.ceil(Math.sqrt(Math.random() * wavePower * 5)), 0, Math.random()])
         }
     }
 }

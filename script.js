@@ -26,7 +26,7 @@ let downPressed = false;
 
 let gameStarted = false;
 
-let water = []
+let water;
 
 function keyPressed() {
     if (keyCode === LEFT_ARROW || key === 'a') {
@@ -74,12 +74,15 @@ window.addEventListener("keyup", function (event) {
 function setup() {
     createCanvas(500, 500, document.getElementById("battlefield"))
     noStroke()
+    updateChemistry()
+    updateAtomShop()
+    updateCompoundPurchase()
 }
 let gameOver = false
 
 function draw() {
     background(0)
-
+    console.log(water)
 
 
     //enemy handling
@@ -94,8 +97,8 @@ function draw() {
         let d = dist(player[0], player[1], e[0], e[1])
         e[0] += xdiff * e[4] * 2 / d
         e[1] += ydiff * e[4] * 2 / d
-        for (let w of water) {
-            if (dist(e[0], e[1], w[0], w[1]) < 50) {
+        if (water) {
+            if (dist(e[0], e[1], water[0], water[1]) < 100 - e[4]) {
                 e[0] -= xdiff * e[4] / d
                 e[1] -= ydiff * e[4] / d
             }
@@ -118,13 +121,13 @@ function draw() {
     point(player[0], player[1])
 
     //draw water
-    for (let w of water) {
+    if (water) {
         noStroke()
-        fill(50, 150, 255, w[2])
-        ellipse(w[0], w[1], 50, 50)
-        w[2]--;
-        if (w[2] < 0) {
-            water.splice(water.indexOf(w), 1)
+        fill(50, 150, 255, water[2])
+        ellipse(water[0], water[1], 100, 100)
+        water[2]--;
+        if (water[2] < 0) {
+            water = undefined;
         }
     }
 
@@ -140,7 +143,19 @@ function draw() {
         textAlign(CENTER, CENTER)
         text(c[0], num * 70 + 45, 455)
         if (c[1] > 0) {
-            c[1] -= 0.5;
+            console.log(c)
+            switch (c[0]) {
+                case "H2":
+                    c[1] -= 0.5;
+                    break;
+                case "H2O":
+                    c[1] -= 0.4
+                    break;
+                default:
+                    console.log("g")
+                    break;
+            }
+
         }
         num++;
     }
@@ -181,6 +196,7 @@ function draw() {
     }
 
     //compound effects
+    //H2
     if (playerStatus[0]) {
         fill(0, 255, 0, 100)
         ellipse(player[0], player[1], player[2] + 25)
@@ -282,9 +298,7 @@ function updateCoinsAndScore() {
     $("#score").html(score)
     updateAtomShop()
 }
-updateChemistry()
-updateAtomShop()
-updateCompoundPurchase()
+
 
 //purchase functions
 function createCompound(recipe) {
@@ -305,6 +319,7 @@ function buyAtom(x, y) {
         updateCoinsAndScore()
         updateChemistry()
         updateCompoundPurchase()
+        atomInventory.sort()
     }
 }
 
@@ -312,12 +327,13 @@ function buyAtom(x, y) {
 function useCompound(c) {
     try {
         let compound = compoundsInventory[c]
-        if (compound[1] == 0) {
+        if (compound[1] <= 0) {
             if (compound[0] == "H2") {
                 playerStatus[0] = 5;
                 compound[1] += 50
             } else if (compound[0] == "H2O") {
-                water.push([player[0], player[1], 200])
+                console.log("Sdf")
+                water = [player[0], player[1], 200]
                 compound[1] += 50
             }
         }

@@ -4,6 +4,7 @@ let compoundsInventory = []
 const compoundsList = [
     [["H", "H"], "H2"],
     [["H", "H", "O"], "H2O"],
+    [["O", "O"], "O2"],
 ]
 const atomsList = [
     ["H", 10, 5],
@@ -15,7 +16,7 @@ let score = 0;
 let enemies = [];
 let enemySpawnChances = 1
 let player = [250, 250, 50]
-let playerStatus = [0]
+let playerStatus = [0, 0]
 let waveTimer = 100;
 let wavePower = 1
 
@@ -82,7 +83,6 @@ let gameOver = false
 
 function draw() {
     background(0)
-    console.log(water)
 
 
     //enemy handling
@@ -97,6 +97,7 @@ function draw() {
         let d = dist(player[0], player[1], e[0], e[1])
         e[0] += xdiff * e[4] * 2 / d
         e[1] += ydiff * e[4] * 2 / d
+        //water slowness
         if (water) {
             if (dist(e[0], e[1], water[0], water[1]) < 100 - e[4]) {
                 e[0] -= xdiff * e[4] / d
@@ -119,6 +120,12 @@ function draw() {
     stroke(0, 150, 255)
     strokeWeight(player[2] / 2)
     point(player[0], player[1])
+
+    //show oxygen
+    stroke(0, 255, 0, playerStatus[1]*3)
+    strokeWeight(player[2] / 2)
+    point(player[0], player[1])
+    if(playerStatus[1]>0){playerStatus[1]--;}
 
     //draw water
     if (water) {
@@ -143,7 +150,6 @@ function draw() {
         textAlign(CENTER, CENTER)
         text(c[0], num * 70 + 45, 455)
         if (c[1] > 0) {
-            console.log(c)
             switch (c[0]) {
                 case "H2":
                     c[1] -= 0.5;
@@ -152,7 +158,7 @@ function draw() {
                     c[1] -= 0.4
                     break;
                 default:
-                    console.log("g")
+                    c[1] -= 0.5;
                     break;
             }
 
@@ -189,6 +195,39 @@ function draw() {
                 player[1] += Math.sqrt(4.5);
             }
         }
+
+        //oxygen bonus
+        console.log(playerStatus[1])
+        if (playerStatus[1]>0) {
+            if (((leftPressed || upPressed) && !(leftPressed && upPressed)) && ((leftPressed || downPressed) && !(leftPressed && downPressed)) && ((rightPressed || upPressed) && !(rightPressed && upPressed)) && ((rightPressed || downPressed) && !(rightPressed && downPressed))) {
+                if (leftPressed) {
+                    player[0] -= 6;
+                }
+                if (rightPressed) {
+                    player[0] += 6;
+                }
+                if (upPressed) {
+                    player[1] -= 6;
+                }
+                if (downPressed) {
+                    player[1] += 6;
+                }
+            } else {
+                if (leftPressed) {
+                    player[0] -= 2*Math.sqrt(4.5);
+                }
+                if (rightPressed) {
+                    player[0] += 2*Math.sqrt(4.5);
+                }
+                if (upPressed) {
+                    player[1] -= 2*Math.sqrt(4.5);
+                }
+                if (downPressed) {
+                    player[1] += 2*Math.sqrt(4.5);
+                }
+            }
+        }
+
         //compound use
         if (Number(key)) {
             useCompound(Number(key) - 1)
@@ -199,9 +238,9 @@ function draw() {
     //H2
     if (playerStatus[0]) {
         fill(0, 255, 0, 100)
-        ellipse(player[0], player[1], player[2] + 25)
+        ellipse(player[0], player[1], 70)
         for (let e of enemies) {
-            if (dist(e[0], e[1], player[0], player[1]) < player[2] + 25 / 2) {
+            if (dist(e[0], e[1], player[0], player[1]) < 35) {
                 e[2] -= 1;
                 if (e[2] < 0) {
                     enemies.splice(enemies.indexOf(e), 1)
@@ -332,8 +371,10 @@ function useCompound(c) {
                 playerStatus[0] = 5;
                 compound[1] += 50
             } else if (compound[0] == "H2O") {
-                console.log("Sdf")
                 water = [player[0], player[1], 200]
+                compound[1] += 50
+            } else if (compound[0] == "O2") {
+                playerStatus[1] = 40;
                 compound[1] += 50
             }
         }
